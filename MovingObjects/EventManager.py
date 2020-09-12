@@ -19,7 +19,7 @@ class EventManager:
 
     def check_off_grid(self):
         if self.ball.y <= 0 or self.ball.y >= Constants.DISPLAY_HEIGHT:
-            self.ball.reset()
+            self.ball.dy *= -1
 
     def check_score(self):
         # if pong ball hits a wall, add score to player
@@ -70,25 +70,9 @@ class EventManager:
     def redirect(self, rect):
         # get angle hit on the racket
         redirectAngle = rect.getRedirectAngle(self.ball.y)
-        #self.ball.y = 490
-        #redirectAngle = 10.00
-        print("ball @ (", self.ball.x , ",", self.ball.y , ")")
-        print("\t rediret angle= ", redirectAngle, end="")
-        # get the distance of ball from wall
-        dy = float(self.ball.y)
-        if redirectAngle < 0.00:
-            dy = Constants.DISPLAY_HEIGHT - self.ball.y
-
-        # calculate how much x distance travel until touch top or bottom wall
-        dx = abs( self.calculateXDistance(redirectAngle, dy) )
-        print(dx)
-
-        # adjust the dx and dy of the ball
+        print("ball @ (", self.ball.x , ",", self.ball.y , ") -> rediret angle= ", redirectAngle, end="")
+        # do NOT change the DX speed of the ball. IT SHOULD NEVER CHANGE!!
+        self.ball.dy = Constants.PONG_SPEED * (redirectAngle / Constants.MAX_REDIRECT_ANGLE)
+        self.ball.dy = abs(self.ball.dy ) if redirectAngle < 0.00 else -1 * abs(self.ball.dy)
         self.ball.flipDir()
-        self.ball.dy = float(  dy/dx )
-        print("dx= ", dx, ",  ball dy=", self.ball.dy )
-
-
-    def calculateXDistance(self, angle, opp):
-        if angle == 0: return 0
-        return float( opp/(math.tan((angle * 3.14159 / 180 ))))
+        print(",  dx= ", self.ball.dx, ",  ball dy=", self.ball.dy )

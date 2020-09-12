@@ -77,11 +77,6 @@ while running:
         ComputerPlayer.dy = 0
         HumanPlayer.dy    = 0
 
-    # # if player hits the pong ball, redirect the ball
-    # Grid.check_collision()
-    # # if pong ball hits a wall, add score to player
-    # Grid.check_score()# if player won, stop game
-
     #Update all elements
     # First, erase the display and repaint white
     display.fill(Colors.WHITE)

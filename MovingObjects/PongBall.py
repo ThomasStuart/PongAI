@@ -12,7 +12,7 @@ class PongBall(object):
         self.x      = x
         self.y      = y
         self.dir    = 1
-        self.dx     = 20
+        self.dx     = Constants.PONG_SPEED
         self.dy     = 0
 
         self.display = display
@@ -36,5 +36,6 @@ class PongBall(object):
     def reset(self):
         self.x = Constants.PONG_START_X
         self.y = Constants.PONG_START_Y
+        self.dx = Constants.PONG_SPEED
         self.dy = 0
         self.dir = -1 if random.randint(0,1) == 0 else 1

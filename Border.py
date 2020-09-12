@@ -9,7 +9,7 @@ class Border:
         self.y = startY
 
     def draw(self, display):
-        offset = Constants.BORDER_HEIGHT + 100
+        offset = Constants.BORDER_HEIGHT + 50
 
-        for i in range(8):
+        for i in range(15):
             pygame.draw.rect(display, Colors.BLACK, (self.x, ( (i  * Constants.BORDER_HEIGHT) + (i * offset)), Constants.BORDER_WIDTH, Constants.BORDER_HEIGHT))

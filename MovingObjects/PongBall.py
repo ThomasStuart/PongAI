@@ -1,5 +1,8 @@
 import pygame
 import math
+import Constants
+import random
+import Arrow
 
 class PongBall(object):
 
@@ -9,40 +12,29 @@ class PongBall(object):
         self.x      = x
         self.y      = y
         self.dir    = 1
-        self.circle = pygame.draw.circle(display, self.color, (self.x, self.y), self.radius )
+        self.dx     = 20
+        self.dy     = 0
 
-    def move(self, display):
-        self.x += 20 * self.dir
-        pygame.draw.circle(display, self.color, (self.x , self.y), self.radius )
+        self.display = display
+        self.circle = pygame.draw.circle(display, self.color, (self.x, self.y), self.radius )
+        #self.arrow  = Arrow()
+
+    # def move(self):
+    #     self.x += 20 * self.dir
+    #     pygame.draw.circle(self.display, self.color, (self.x , self.y), self.radius )
 
     def flipDir(self):
         self.dir = -1 * self.dir
 
-    def collision(self, rleft, rtop, width, height,  # rectangle definition
-                  center_x, center_y, radius):  # circle definition
-        """ Detect collision between a rectangle and circle. """
 
-        # complete boundbox of the rectangle
-        rright, rbottom = rleft + width, rtop + height
+    def updatePosition(self):
+        self.x +=  self.dx * self.dir
+        self.y +=  self.dy
+        pygame.draw.circle(self.display, self.color, (self.x, self.y), self.radius)
 
-        # bounding box of the circle
-        cleft, ctop = center_x - radius, center_y - radius
-        cright, cbottom = center_x + radius, center_y + radius
 
-        # trivial reject if bounding boxes do not intersect
-        if rright < cleft or rleft > cright or rbottom < ctop or rtop > cbottom:
-            return False  # no collision possible
-
-        # check whether any point of rectangle is inside circle's radius
-        for x in (rleft, rleft + width):
-            for y in (rtop, rtop + height):
-                # compare distance between circle's center point and each point of
-                # the rectangle with the circle's radius
-                if math.hypot(x - center_x, y - center_y) <= radius:
-                    return True  # collision detected
-
-        # check if center of circle is inside rectangle
-        if rleft <= center_x <= rright and rtop <= center_y <= rbottom:
-            return True  # overlaid
-
-        return False  # no collision detected
+    def reset(self):
+        self.x = Constants.PONG_START_X
+        self.y = Constants.PONG_START_Y
+        self.dy = 0
+        self.dir = -1 if random.randint(0,1) == 0 else 1

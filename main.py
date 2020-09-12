@@ -1,22 +1,26 @@
 # Import and initialize the pygame library
-import Colors
-import Constants
-import math
 import pygame
-from MovingObjects.Racket import Racket
+from MovingObjects.Player import Player
 from MovingObjects.PongBall import PongBall
 from Border import Border
+from AngledLine import*
+from MovingObjects.EventManager import*
+import Colors
+import Constants
 
 def text_objects(text, font):
     textSurface = font.render(text, True, Colors.BLACK)
     return textSurface, textSurface.get_rect()
 
-def message_display(text, gameDisplay):
+def message_display(text, x, y, gameDisplay):
     largeText = pygame.font.Font('freesansbold.ttf',115)
     TextSurf, TextRect = text_objects(text, largeText)
-    TextRect.center = ((Constants.DISPLAY_WIDTH/2),(50))
+    TextRect.center = (x, y)
     gameDisplay.blit(TextSurf, TextRect)
 
+def display_score(computerPlayer, humanPlayer, gameDisplay):
+    message_display( str(computerPlayer.score), Constants.COMPUTER_SCORE_X, Constants.SCORE_Y, gameDisplay)
+    message_display( str(humanPlayer.score),    Constants.HUMAN_SCORE_X,    Constants.SCORE_Y, gameDisplay)
 
 pygame.init()
 
@@ -26,15 +30,16 @@ display = pygame.display.set_mode([Constants.DISPLAY_WIDTH, Constants.DISPLAY_HE
 display.fill(Colors.WHITE)
 
 #GeneratePlayers
-ComputerPlayer = Racket(Colors.BLUE, Constants.RACKET_OFFSET, Constants.RACKET_START_HEIGHT, Constants.RACKET_WIDTH,
-                      Constants.RACKET_HEIGHT, display)
+ComputerPlayer = Player(Colors.BLUE, Constants.RACKET_OFFSET, Constants.RACKET_START_HEIGHT, Constants.RACKET_WIDTH,
+                        Constants.RACKET_HEIGHT, display, False)
 
-HumanPlayer = Racket(Colors.BLUE, Constants.DISPLAY_WIDTH - Constants.RACKET_OFFSET - Constants.RACKET_WIDTH ,
-                    Constants.RACKET_START_HEIGHT, Constants.RACKET_WIDTH, Constants.RACKET_HEIGHT, display)
+HumanPlayer = Player(Colors.BLUE, Constants.DISPLAY_WIDTH - Constants.RACKET_OFFSET - Constants.RACKET_WIDTH,
+                     Constants.RACKET_START_HEIGHT, Constants.RACKET_WIDTH, Constants.RACKET_HEIGHT, display, True)
 
 Ball   = PongBall(Colors.RED, Constants.PONG_START_X, Constants.PONG_START_Y, Constants.PONG_RADIUS, display)
 Border = Border(Constants.BORDER_X, Constants.BORDER_Y)
 
+Grid  = EventManager(ComputerPlayer, HumanPlayer, Ball, display)
 # Run until the user asks to quit
 FPS = 25
 clock = pygame.time.Clock()
@@ -42,10 +47,7 @@ running = True
 pressed_up   = False
 pressed_down = False
 
-start_pos = (100,100)
-radar_len = 15
-#x = radar[0] + math.cos(math.radians(135)) * radar_len
-#y = radar[1] + math.sin(math.radians(135)) * radar_len
+
 
 while running:
     #Did the user click the window close button?
@@ -71,26 +73,27 @@ while running:
     elif pressed_down:
         ComputerPlayer.moveDown()
         HumanPlayer.moveDown()
+    else:
+        ComputerPlayer.dy = 0
+        HumanPlayer.dy    = 0
 
-    # move the computer
-    # move the ball
+    # # if player hits the pong ball, redirect the ball
+    # Grid.check_collision()
+    # # if pong ball hits a wall, add score to player
+    # Grid.check_score()# if player won, stop game
 
-    # if player hits the pong ball, redirect
-    # if pong ball hits a wall, add score to player
-        # reset the ball
-
-    # if player won, stop game
+    #Update all elements
+    # First, erase the display and repaint white
     display.fill(Colors.WHITE)
-    if Ball.collision(HumanPlayer.x, HumanPlayer.y, HumanPlayer.width, HumanPlayer.height, Ball.x, Ball.y, Ball.radius) or Ball.collision(ComputerPlayer.x, ComputerPlayer.y, ComputerPlayer.width, ComputerPlayer.height, Ball.x, Ball.y, Ball.radius):
-        print("True")
-        Ball.flipDir()
-
+    # Second, draw on next frame
     HumanPlayer.draw()
     ComputerPlayer.draw()
-    Ball.move(display)
-    message_display("Score", display)
     Border.draw(display)
-    #pygame.draw.line(display, Colors.BLUE, radar, (x, y), 1)
+    Grid.checkEvents()
+    Ball.updatePosition()
+    display_score(ComputerPlayer, HumanPlayer, display)
+
+    # update the display with the new changes
     pygame.display.update()
     # - FPS - keep the same speed on all computers -
     clock.tick(FPS)

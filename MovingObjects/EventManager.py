@@ -70,8 +70,10 @@ class EventManager:
     def redirect(self, rect):
         # get angle hit on the racket
         redirectAngle = rect.getRedirectAngle(self.ball.y)
+        #self.ball.y = 490
+        #redirectAngle = 10.00
         print("ball @ (", self.ball.x , ",", self.ball.y , ")")
-        print("\t rediret angle= ", redirectAngle, end="\t")
+        print("\t rediret angle= ", redirectAngle, end="")
         # get the distance of ball from wall
         dy = float(self.ball.y)
         if redirectAngle < 0.00:
@@ -79,13 +81,14 @@ class EventManager:
 
         # calculate how much x distance travel until touch top or bottom wall
         dx = abs( self.calculateXDistance(redirectAngle, dy) )
+        print(dx)
 
         # adjust the dx and dy of the ball
         self.ball.flipDir()
         self.ball.dy = float(  dy/dx )
-        print("ball dx= ", self.ball.dx, ",  ball dy=", self.ball.dy )
+        print("dx= ", dx, ",  ball dy=", self.ball.dy )
 
 
     def calculateXDistance(self, angle, opp):
         if angle == 0: return 0
-        return float( opp/(math.tan(angle)))
+        return float( opp/(math.tan((angle * 3.14159 / 180 ))))
